@@ -14,9 +14,12 @@ class Add(APIView):
                     sum += Decimal(nums[i])
                 return Response({'result': sum})
 
-            elif "number1" in kwargs.keys() and "number2" in kwargs.keys():
-                sum = Decimal(kwargs["number1"])+Decimal(kwargs["number2"])
-                return Response({'result': sum})
+            elif "number1" in kwargs.keys() :
+                if "number2" in kwargs.keys():
+                    sum = Decimal(kwargs["number1"])+Decimal(kwargs["number2"])
+                    return Response({'result': sum})
+                else:
+                    return Response({'result':Decimal(kwargs["number1"])})
 
             else:
                 return Response({"content":'you should enter at least one number.'})
