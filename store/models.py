@@ -1,52 +1,78 @@
 from django.db import models
-from django.contrib.auth.models import AbstractBaseUser
+from django.contrib.auth.models import AbstractUser
 
-#AbstractBaseUser has password
 
-class Costumer(AbstractBaseUser):
-    Username = models.CharField(max_length=50)
+class User(AbstractUser):
+    username = models.CharField(max_length=50, unique=True)
+    email = models.EmailField()
 
-class SalesMan(AbstractBaseUser):
-    Username = models.CharField(max_length=50)
-    ActivityDescription = models.TextField()
-    ActivityFields = models.CharField(max_length=300)
-    Approved = models.BooleanField()
-    Email = models.EmailField()
-    IdentificationImage = models.TextField()
-    Location = models.CharField(max_length=300)
-    Name = models.CharField(max_length=300)
-    PhoneNumber = models.CharField(max_length=12)
-    ProfileImage=models.TextField()
-    RegistrationTime=models.DateTimeField()
-    Suspend = models.BooleanField()
+    USERNAME_FIELD = 'username'
+    REQUIRED_FIELDS = ['email']
+
+    def __str__(self):
+        return '({}, {})'.format(self.username, self.email)
+
+
+class Customer(User):
+    pass     
+
+
+class Salesman(User):
+    name = models.CharField(max_length=300)
+    phone_number = models.CharField(max_length=12)
+    activity_description = models.TextField()
+    activity_fields = models.CharField(max_length=300) # ???
+    approved = models.BooleanField()
+    location = models.CharField(max_length=300)
+    profile_image = models.ImageField(upload_to='salesman_profile', blank=True)
+    identification_image = models.ImageField(upload_to='salesman_identification_image', blank=True)
+    registration_time = models.DateTimeField(auto_now_add=True) # ???
+    suspend = models.BooleanField()
 
 
 class Basket(models.Model):
-    costumer = models.ForeignKey(Costumer , on_delete=models.CASCADE)
-    PaymentStatus = models.CharField(max_length=50)
-    PayTime = models.DateTimeField()
-    RecordTime = models.DateTimeField()
-    TrackingCode = models.CharField(max_length=300)
+    STATE_CHOICES = [
+        ('pr', 'processing'),
+        ('se', 'sending'),
+        ('de', 'delivered')
+    ]
+
+    customer = models.ForeignKey(Customer , on_delete=models.CASCADE, related_name='baskets')
+    payment_status = models.CharField(max_length=2, choices=STATE_CHOICES, default='pr')
+    pay_time = models.DateTimeField()
+    record_time = models.DateTimeField(auto_now_add=True) # ???
+    tracking_code = models.CharField(max_length=300)
+
+
+class Color(models.Model):
+    name = models.CharField(max_length=10, primary_key=True)
+
+
+class Category(models.Model):
+    name = models.CharField(max_length=20, primary_key=True)
+
 
 class Product(models.Model):
-    SalesMan = models.ForeignKey(SalesMan , on_delete=models.CASCADE)
-    Category = models.CharField(max_length=300)
-    Color = models.CharField(max_length=50)
-    Count = models.IntegerField()
-    Description = models.TextField()
-    isStock = models.BooleanField(default=False)
-    Name = models.CharField(max_length=300)
+    name = models.CharField(max_length=300)
     Price = models.IntegerField()
-    RecordTime = models.DateTimeField()
-
-
+    salesman = models.ForeignKey(Salesman , on_delete=models.CASCADE, related_name='products')
+    category = models.ForeignKey(Category, on_delete=models.SET_NULL, related_name='products')
+    color = models.ForeignKey(Color, on_delete=models.SET_NULL, related_name='products')
+    count = models.IntegerField()
+    description = models.TextField()
+    is_stock = models.BooleanField(default=False)
+    record_time = models.DateTimeField(auto_now_add=True) # ???
+    
 
 class ProductImage(models.Model):
-    ImageContent = models.ImageField()
+    product = models.ForeignKey(Product, on_delete=models.CASCADE, related_name='images')
+    image_content = models.ImageField(upload_to='product', blank=True)
+
 
 class BasketProduct(models.Model):
-    Count = models.IntegerField()
-    State = models.CharField(max_length=50)
-    Basket = models.ForeignKey(Basket , on_delete=models.CASCADE)
-    Product = models.ForeignKey(Product , on_delete=models.CASCADE)
+    basket = models.ForeignKey(Basket , on_delete=models.CASCADE)
+    product = models.ForeignKey(Product , on_delete=models.CASCADE)
+    count = models.IntegerField()
+    state = models.CharField(max_length=20) # ???
+
 
