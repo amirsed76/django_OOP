@@ -41,7 +41,6 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    'corsheaders',
     'rest_framework',
 ]
 
@@ -147,7 +146,9 @@ REST_REGISTRATION = {
     'REGISTER_EMAIL_VERIFICATION_ENABLED': False,
 }
 
-AUTH_PROFILE_MODULE ="store.models.Costumer"
+AUTH_PROFILE_MODULE ="store.User"
+COGNITO_USER_MODEL = "store.User"
+AUTH_USER_MODEL = "store.User"
 
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 MEDIA_URL = '/media/'
