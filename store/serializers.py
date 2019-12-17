@@ -9,6 +9,7 @@ class UserSerializer(serializers.ModelSerializer):
 
 
 class CustomerSerializer(serializers.ModelSerializer):
+    user = serializers.PrimaryKeyRelatedField(models.User)
     class Meta:
         model = models.Customer
         fields = ['username', 'email']
@@ -66,3 +67,19 @@ class BasketProductSerializer(serializers.ModelSerializer):
     class Meta:
         model = models.BasketProduct
         fields = '__all__'
+
+# class UserPrivateSerializer(serializers.ModelSerializer):
+#     STATE_CHOICES = [
+#         ('costumer ', 'Costumer'),
+#         ('salesman','Salesman')
+#     ]
+#     user_type = serializers.ChoiceField(STATE_CHOICES)
+#
+#     class Meta :
+#         model = models.User
+#         fields = '__all__'
+#
+#     def create(self, validated_data):
+#         if self.user_type == "costumer":
+#             models.Customer.
+#

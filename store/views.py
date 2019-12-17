@@ -13,3 +13,6 @@ class get_basket(APIView):
             # list1=[]
             return Response({"exist":exist ,"content":list1})
 
+
+
+
