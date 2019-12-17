@@ -25,10 +25,10 @@ class Salesman(models.Model):
     activityFields = models.CharField(max_length=300) # ???
     approved = models.BooleanField()
     location = models.CharField(max_length=300)
-    profileImage = models.ImageField(upload_to='salesman_profile', blank=True)
-    identificationImage = models.ImageField(upload_to='salesman_identification_image', blank=True)
+    profileImage = models.ImageField(upload_to='salesman_profile', blank=True , null= True)
+    identificationImage = models.ImageField(upload_to='salesman_identification_image', blank=True , null=True)
     registrationTime = models.DateTimeField(auto_now_add=True) # ???
-    suspend = models.BooleanField()
+    suspend = models.BooleanField(default=False)
 
     def __str__(self):
         return '({}, {})'.format(self.username, self.email)
