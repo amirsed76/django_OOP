@@ -1,8 +1,9 @@
 
 from rest_framework.views import APIView
 from rest_framework.response import Response
-from decimal import Decimal
-
+from rest_framework import generics
+from . import models
+from . import serializers
 class get_basket(APIView):
 
     def get(self, request, *args, **kwargs):
@@ -15,4 +16,8 @@ class get_basket(APIView):
 
 
 
+class ProductDetailView(generics.RetrieveAPIView):
+    queryset = models.Product.objects.all()
+    serializer_class = serializers.ProductSerializer
+    lookup_field = 'id'
 

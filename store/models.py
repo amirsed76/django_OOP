@@ -70,7 +70,9 @@ class Product(models.Model):
     # category = models.ForeignKey(Category, on_delete=models.SET_NULL, related_name='products' , null=True)
     # color = models.ForeignKey(Color, on_delete=models.SET_NULL, related_name='products' , null=True)
     recordTime = models.DateTimeField(auto_now_add=True) # ???
-    
+    def __str__(self):
+        return '({}__{}___{})'.format(self.id, self.name , self.color)
+
 
 class ProductImage(models.Model):
     product = models.ForeignKey(Product, on_delete=models.CASCADE, related_name='images')
