@@ -23,10 +23,6 @@ class ProductDetailView(generics.RetrieveAPIView):
 
 
 class ProductImages(generics.ListAPIView):
-    # queryset = models.Product.objects.all()
-    # queryset = models.Product.objects.filter()
-    # queryset = models.Product.objects.get(id)
-    # employee.license_set.all()
     queryset = models.ProductImage.objects.all()
 
     serializer_class = serializers.ProductImageSerializer
