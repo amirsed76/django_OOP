@@ -2,7 +2,7 @@ from django.db import models
 from django.contrib.auth.models import AbstractUser
 
 
-class Customer(AbstractUser):
+class User(AbstractUser):
     username = models.CharField(max_length=50, unique=True)
     email = models.EmailField()
 
@@ -12,14 +12,11 @@ class Customer(AbstractUser):
     def __str__(self):
         return '({}, {})'.format(self.username, self.email)
     class Meta :
-        verbose_name = 'costumer'
+        verbose_name = 'user'
 
 
 
-class Salesman(models.Model):
-    username = models.CharField(max_length=50, unique=True)
-    email = models.EmailField()
-    name = models.CharField(max_length=300 )
+class Salesman(User):
     phoneNumber = models.CharField(max_length=12)
     activityDescription = models.TextField()
     activityFields = models.CharField(max_length=300) # ???
@@ -43,7 +40,7 @@ class Basket(models.Model):
         ('de', 'delivered')
     ]
 
-    customer = models.ForeignKey(Customer , on_delete=models.CASCADE, related_name='baskets')
+    customer = models.ForeignKey(User, on_delete=models.CASCADE, related_name='baskets')
     paymentStatus = models.CharField(max_length=2, choices=STATE_CHOICES, default='pr')
     payTime = models.DateTimeField() #???
     recordTime = models.DateTimeField(auto_now_add=True) # ???
@@ -56,7 +53,7 @@ class Product(models.Model):
     count = models.IntegerField()
     description = models.TextField(blank=True , null=True)
     isStock = models.BooleanField(default=False)
-    name = models.CharField(max_length=300)
+    name = models.CharField(max_length=300 )
     Price = models.IntegerField()
     salesman = models.ForeignKey(Salesman , on_delete=models.CASCADE, related_name='products')
 
