@@ -66,3 +66,16 @@ def showproducts(request,cat):
     result_page = paginator.paginate_queryset(product_list, request)
     serializer = serializers.ProductSerializer(result_page, many=True)
     return paginator.get_paginated_response(serializer.data)
+
+
+@api_view(['GET'])
+def deleteBasketItem(request,itemID):
+    item=BasketProduct.objects.get(pk=itemID)
+    item.count-=1
+    if item.count==0:
+        item.delete()
+        return Response({"item":"item deleted","delete":True})
+    else:
+        item.save()
+        serializer=BasketProductSerializer(item)
+        return Response({"item":serializer.data,"deleted":False})
