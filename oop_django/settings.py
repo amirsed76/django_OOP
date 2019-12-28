@@ -34,7 +34,6 @@ INSTALLED_APPS = [
     'add',
     'store',
     "corsheaders",
-    'rest_registration',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -42,6 +41,12 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'rest_framework',
+    'rest_framework.authtoken',
+    'rest_auth',
+    'allauth',
+    'rest_auth.registration',
+    'django.contrib.sites',
+    'allauth.account',
 ]
 
 MIDDLEWARE = [
@@ -115,6 +120,7 @@ AUTH_PASSWORD_VALIDATORS = [
         'NAME': 'django.contrib.auth.password_validation.NumericPasswordValidator',
     },
 ]
+SITE_ID = 1
 
 # CORS
 CORS_ORIGIN_ALLOW_ALL = True
@@ -139,19 +145,28 @@ USE_TZ = True
 STATIC_ROOT = os.path.join(BASE_DIR, 'static')
 STATIC_URL = '/static/'
 
+AUTH_USER_MODEL = 'store.Customer'
 
-REST_REGISTRATION = {
-    'REGISTER_VERIFICATION_ENABLED': False,
-    'RESET_PASSWORD_VERIFICATION_ENABLED': False,
-    'REGISTER_EMAIL_VERIFICATION_ENABLED': False,
+REST_AUTH_SERIALIZERS = {
+    "USER_DETAILS_SERIALIZER": "store.serializers.CustomUserDetailsSerializer",
+}
+REST_AUTH_REGISTER_SERIALIZERS = {
+    "REGISTER_SERIALIZER": "store.serializers.CustomRegisterSerializer",
 }
 
+EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
 
-AUTH_PROFILE_MODULE ="store.User"
-COGNITO_USER_MODEL = "store.User"
-AUTH_USER_MODEL = "store.User"
-
-
-MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 MEDIA_URL = '/media/'
+MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 
+REST_FRAMEWORK = {
+    'DEFAULT_AUTHENTICATION_CLASSES': (
+        'rest_framework.authentication.TokenAuthentication',
+        'rest_framework.authentication.SessionAuthentication',
+    ),
+    # 'DEFAULT_PERMISSION_CLASSES': (
+    #     'rest_framework.permissions.IsAuthenticated',
+    # ),
+    'DEFAULT_PAGINATION_CLASS':
+        'rest_framework.pagination.LimitOffsetPagination'
+}

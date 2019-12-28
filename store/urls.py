@@ -1,14 +1,34 @@
-from django.contrib import admin
-from django.urls import path, re_path, register_converter, converters
-from . import views
 
+from rest_framework import routers
+from . import views
+from django.urls import path, include,re_path
+
+
+router = routers.DefaultRouter()
+
+# router.register(r'products', views.ProductViewSet)
+# router.register(r'product_images', views.ProductImageViewSet)
+# router.register(r'salesmans', views.SalesmanViewSet)
+# router.register(r'products', views.ProductView)
+# router.register(r'product_images', views.ProductImageView)
+# router.register(r'salesmans', views.SalesmanView)
+router.register(r'basketproducts', views.BasketProductViewSet)
+router.register(r'baskets', views.BasketViewSet)
+router.register(r'customers', views.CustomerViewSet)
 
 urlpatterns = [
-    path('show_basket', views.get_basket.as_view(), name="show_basket"),
-    re_path('^product/(?P<id>\d+)$',views.ProductDetailView.as_view() , name = "product_detail"),
-    re_path('^product/(?P<id>\d+)/images$',views.ProductImages.as_view() , name = "product_images"),
-    path('search/<str:searched>/', views.search, name='search'),
-    path('searching/<str:searched>/', views.searching, name='searching'),
-    path('categoryProducts/<str:cat>/',views.showproducts,name="show_products"),
-    path('deleteBasketItem/<int:itemID>',views.deleteBasketItem,name="deleteItem")
+    path('', include(router.urls)),
+    # path('my-basket/', views.MyBasketView.as_view()),
+    # path('basket_products/<int:pk>/', views.BasketProductDetail.as_view(), name='basketproduct-detail'),
+    path('categories/', views.GetCategories.as_view(), name="category"),
+    path('products/<int:pk>/images/',views.ProductImages.as_view(),name="product_images"),
+    path('product_images/', views.ProductImageList.as_view()),
+    path('salesmans/', views.SalesmanList.as_view()),
+    path('products/<int:pk>/', views.ProductDetail.as_view()),
+    path('products/', views.ProductList.as_view()),
+    path('product_images/<int:pk>/', views.ProductImageDetail.as_view()),
+    path('salesmans/<int:pk>/', views.SalesmanDetail.as_view()),
+    # path('products/<int:pk>/pics/',views.ProductDetail.as_view(),name="product_images"),
+    # path("products/" , views.ProductView)
+
 ]
