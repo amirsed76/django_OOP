@@ -17,6 +17,38 @@ from rest_framework import filters
 from django.db import transaction
 from rest_framework import mixins
 import uuid
+import random
+import math
+
+
+
+@api_view(['GET'])
+def confirm_basket(request):
+    user_basket=models.Basket.objects.get(customer=request.user , paymentStatus="pr")
+    basket_products=models.BasketProduct.objects.filter(basket=user_basket,state="pr")
+
+    products_serializer=serializers.BasketProductSerializer(basket_products,many=True)
+    return Response(products_serializer.data)
+
+@api_view(['POST'])
+def purchase(request):
+    rand=random.random()
+    successfull=False
+    if rand<.80:
+        successfull=True
+        tracking_code=math.floor(random.random()*1000000)
+        user_basket=models.Basket.objects.get(customer=request.user , paymentStatus="pr")
+        basket_products=models.BasketProduct.objects.filter(basket=user_basket,state="pr")
+        for basket_product in basket_products:
+            basket_product.product.count-=basket_product.count
+            basket_product.product.save()
+            
+        user_basket.paymentStatus="co"
+        user_basket.save()
+        return Response({"successfull":successfull,"tracking_code":tracking_code})
+
+    
+    return Response({"successfull":successfull})
 
 
 # class get_basket(APIView):
@@ -96,6 +128,9 @@ class ProductImages(generics.ListAPIView):
 #         serializer=models.BasketProductSerializer(item)
 #         return Response({"item":serializer.data,"deleted":False})
 #
+
+
+
 class GetCategories(generics.ListAPIView):
     queryset = models.Category.objects.all()
     serializer_class = serializers.CategorySerializer

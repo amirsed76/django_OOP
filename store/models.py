@@ -78,13 +78,21 @@ class Basket(models.Model):
     trackingCode = models.CharField(max_length=300, null=True , blank=True)
     payTime = models.DateTimeField( null=True , blank=True)
 
+    def __str__(self):
+        return self.customer.username + "-" + self.paymentStatus
+
 
 class Color(models.Model):
     name = models.CharField(max_length=50)
 
+    def __str__(self):
+        return self.name
 
 class Category(models.Model):
     name = models.CharField(max_length=50)
+
+    def __str__(self):
+        return self.name    
 
 
 class Product(models.Model):
@@ -96,10 +104,10 @@ class Product(models.Model):
     salesman = models.ForeignKey(Salesman , on_delete=models.CASCADE, related_name='products')
     recordTime = models.DateTimeField(auto_now_add=True)
     color = models.ForeignKey(Color, on_delete=models.SET_NULL, related_name='color', null=True)
-    category = models.ForeignKey(Color, on_delete=models.SET_NULL, related_name='category', null=True)
+    category = models.ForeignKey(Category, on_delete=models.SET_NULL, related_name='category', null=True)
 
     def __str__(self):
-        return '({})'.format(self.name)
+         return '({}, {})'.format(self.name , self.count)
 
 
 class ProductImage(models.Model):
@@ -119,5 +127,5 @@ class BasketProduct(models.Model):
     state = models.CharField(max_length=2, choices=STATE_CHOICES, default='pr')
 
     def __str__(self):
-        return '({}, {})'.format(self.product , self.basket.customer)
+        return '({}, {} , {},{})'.format(self.product.name , self.basket.customer , self.count,self.basket)
 

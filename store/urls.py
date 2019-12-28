@@ -18,6 +18,8 @@ router.register(r'customers', views.CustomerViewSet)
 
 urlpatterns = [
     path('', include(router.urls)),
+    path('confirm_basket/',views.confirm_basket,name="confirm_basket"),
+    path('purchase/',views.purchase,name="purchase"),
     # path('my-basket/', views.MyBasketView.as_view()),
     # path('basket_products/<int:pk>/', views.BasketProductDetail.as_view(), name='basketproduct-detail'),
     path('categories/', views.GetCategories.as_view(), name="category"),
