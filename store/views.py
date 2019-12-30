@@ -195,7 +195,7 @@ class FinalPayment(APIView):
 
 class BasketViewSet(viewsets.ModelViewSet):
     serializer_class = serializers.BasketSerializer
-    queryset = queryset = models.Basket.objects.all()
+    queryset  = models.Basket.objects.all()
 
     def get_queryset(self):
         queryset = models.Basket.objects.filter(customer=self.request.user)
