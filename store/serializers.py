@@ -32,6 +32,7 @@ class SalesmanSerializer(serializers.ModelSerializer):
 
 
 class BasketSerializer(serializers.ModelSerializer):
+    products = serializers.PrimaryKeyRelatedField(many=True, read_only=True)
     class Meta:
         model = models.Basket
         fields = '__all__'
@@ -52,10 +53,9 @@ class ProductImageSerializer(serializers.ModelSerializer):
 
 
 class BasketProductSerializer(serializers.ModelSerializer):
-    product = ProductSerializer()
     class Meta:
         model = models.BasketProduct
-        fields = ('basket','product','count','state')
+        fields = '__all__'
 
 
 class SalesmanProfileImageSerializer(serializers.ModelSerializer):

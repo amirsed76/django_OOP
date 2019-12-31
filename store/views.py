@@ -205,6 +205,10 @@ class BasketProductViewSet(viewsets.ModelViewSet):
     serializer_class = serializers.BasketProductSerializer
     queryset = models.BasketProduct.objects.all()
 
+    def get_queryset(self):
+        queryset = models.BasketProduct.objects.filter(basket__customer=self.request.user)
+        return queryset
+
     @transaction.atomic
     def create(self, request, *args, **kwargs):
         product_id = request.data['product']
