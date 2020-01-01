@@ -11,18 +11,29 @@ https://docs.djangoproject.com/en/2.2/ref/settings/
 """
 
 # django environ
-import environ
 
-env = environ.Env(
-    DEBUG=(bool, False)
-)
 
-environ.Env.read_env()
 
 import os
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
-BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+import environ
+
+PROJECT_DIR = os.path.dirname(os.path.abspath(__file__))
+BASE_DIR = os.path.dirname(PROJECT_DIR)
+
+env = environ.Env(
+    SECRET_KEY=str,
+    DEBUG=(bool, False),
+    ALLOWED_HOSTS=(list, ['127.0.0.1:8000']),
+    DATABASE_URL=str,
+    
+    CORS_ORIGIN_ALLOW_ALL=bool,
+)
+
+
+
+environ.Env.read_env(os.path.join(BASE_DIR, '.env'))
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/2.2/howto/deployment/checklist/
@@ -37,7 +48,8 @@ SECRET_KEY = env('SECRET_KEY')
 # false in os.environ
 DEBUG = env('DEBUG')
 
-ALLOWED_HOSTS = ['*']
+if DEBUG==False:
+    ALLOWED_HOSTS=env("ALLOWED_HOSTS")
 
 # Application definition
 
@@ -126,7 +138,7 @@ AUTH_PASSWORD_VALIDATORS = [
 SITE_ID = 1
 
 # CORS
-CORS_ORIGIN_ALLOW_ALL = True
+CORS_ORIGIN_ALLOW_ALL = env('CORS_ORIGIN_ALLOW_ALL')
 
 # Internationalization
 # https://docs.djangoproject.com/en/2.2/topics/i18n/
@@ -143,8 +155,8 @@ USE_TZ = True
 
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/2.2/howto/static-files/
-STATIC_ROOT = os.path.join(BASE_DIR, 'static')
-STATIC_URL = '/static/'
+STATIC_ROOT = env('STATIC_ROOT')
+STATIC_URL = env('STATIC_URL')
 
 AUTH_USER_MODEL = 'store.Customer'
 
@@ -157,8 +169,8 @@ REST_AUTH_REGISTER_SERIALIZERS = {
 
 EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
 
-MEDIA_URL = '/media/'
-MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
+MEDIA_URL = env('MEDIA_URL')
+MEDIA_ROOT = env('MEDIA_ROOT')
 
 REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': (
