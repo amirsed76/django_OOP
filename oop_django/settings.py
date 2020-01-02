@@ -70,6 +70,7 @@ INSTALLED_APPS = [
     'rest_auth.registration',
     'django.contrib.sites',
     'allauth.account',
+    'rest_framework_swagger',
 ]
 
 MIDDLEWARE = [
@@ -117,6 +118,17 @@ WSGI_APPLICATION = 'oop_django.wsgi.application'
 DATABASES = {
     'default': env.db(),
 }
+# DATABASES = {
+#     'default': {
+#         'ENGINE': 'django.db.backends.mysql',
+#         'NAME': 'oop_project',
+#         'USER': 'root',
+#         'PASSWORD': '',
+#         'HOST': '',
+#         'PORT': '',
+#     }
+# }
+
 
 # Password validation
 # https://docs.djangoproject.com/en/2.2/ref/settings/#auth-password-validators
