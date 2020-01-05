@@ -19,6 +19,15 @@ from rest_framework import mixins
 import uuid
 import random
 import math
+from rest_auth.views import LoginView
+
+class CustomerLoginView(LoginView):
+    def post(self, request, *args, **kwargs):
+        keep = request.data.get('keep', None)
+        if not keep:
+            request.session.set_expiry(0)
+    
+        return super().post(request, *args, **kwargs)
 
 
 

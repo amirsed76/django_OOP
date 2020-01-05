@@ -30,6 +30,7 @@ urlpatterns = [
     path('products/', views.ProductList.as_view()),
     path('product_images/<int:pk>/', views.ProductImageDetail.as_view()),
     path('salesmans/<int:pk>/', views.SalesmanDetail.as_view()),
+    path('login/', views.CustomerLoginView.as_view()),
     # path('products/<int:pk>/pics/',views.ProductDetail.as_view(),name="product_images"),
     # path("products/" , views.ProductView)
 
