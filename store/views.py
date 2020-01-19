@@ -3,8 +3,9 @@ from rest_framework.decorators import api_view
 from itertools import chain
 from rest_framework import pagination
 from rest_auth.registration.views import RegisterView
-
+import datetime
 from . import models
+from .models import Salesman
 from . import serializers
 from rest_framework import viewsets
 from rest_framework import response
@@ -39,26 +40,40 @@ def confirm_basket(request):
     products_serializer=serializers.BasketProductSerializer(basket_products,many=True)
     return Response(products_serializer.data)
 
-@api_view(['POST'])
+@api_view(['POST','GET'])
 def purchase(request):
+    user_basket=models.Basket.objects.get(customer=request.user , paymentStatus="pr")
+    basket_products=models.BasketProduct.objects.filter(basket=user_basket,state="pr")
+    if request.method == 'GET':
+        total_price=0
+        for basket_product in basket_products:
+            total_price += basket_product.count * basket_product.product.Price
+        
+        return Response({"total_price":total_price})    
+
     rand=random.random()
     successfull=False
     if rand<.80:
         successfull=True
         tracking_code=math.floor(random.random()*1000000)
-        user_basket=models.Basket.objects.get(customer=request.user , paymentStatus="pr")
-        basket_products=models.BasketProduct.objects.filter(basket=user_basket,state="pr")
         for basket_product in basket_products:
             basket_product.product.count-=basket_product.count
             basket_product.product.save()
             
         user_basket.paymentStatus="co"
+        user_basket.trackingCode=tracking_code
+        user_basket.payTime=datetime.datetime.now()
         user_basket.save()
         return Response({"successfull":successfull,"tracking_code":tracking_code})
 
     
     return Response({"successfull":successfull})
 
+@api_view(["GET"])
+def communicate_seller(request , id):
+    seller = Salesman.objects.get(id=id)
+    salesman_serializer=serializers.SalesmanSerializer(seller)
+    return Response(salesman_serializer.data)
 
 # class get_basket(APIView):
 #     def get(self, request, *args, **kwargs):
