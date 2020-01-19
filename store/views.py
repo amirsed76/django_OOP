@@ -5,7 +5,7 @@ from rest_framework import pagination
 from rest_auth.registration.views import RegisterView
 import datetime
 from . import models
-from .models import Salesman
+from .models import Salesman , Basket , BasketProduct
 from . import serializers
 from rest_framework import viewsets
 from rest_framework import response
@@ -31,6 +31,12 @@ class CustomerLoginView(LoginView):
         return super().post(request, *args, **kwargs)
 
 
+@api_view(['GET'])
+def purchase_list(request):
+    completed_baskets=Basket.objects.filter(customer=request.user , paymentStatus="co")
+    basket_products=BasketProduct.objects.filter(basket__in=completed_baskets)
+    basket_product_serializer=serializers.BasketProductSerializer(basket_products , many=True) 
+    return Response(basket_product_serializer.data)
 
 @api_view(['GET'])
 def confirm_basket(request):

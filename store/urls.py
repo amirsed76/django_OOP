@@ -32,6 +32,7 @@ urlpatterns = [
     path('salesmans/<int:pk>/', views.SalesmanDetail.as_view()),
     path('login/', views.CustomerLoginView.as_view()),
     path('communicate_seller/<int:id>',views.communicate_seller,name="communicate_seller"),
+    path('purchase_list/',views.purchase_list,name='purchase_list'),
     # path('products/<int:pk>/pics/',views.ProductDetail.as_view(),name="product_images"),
     # path("products/" , views.ProductView)
 
