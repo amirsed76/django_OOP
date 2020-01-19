@@ -10,6 +10,10 @@ For the full list of settings and their values, see
 https://docs.djangoproject.com/en/2.2/ref/settings/
 """
 
+# django environ
+
+
+
 import os
 
 
@@ -32,20 +36,51 @@ env = environ.Env(
 environ.Env.read_env(os.path.join(BASE_DIR, '.env'))
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
+<<<<<<< HEAD
+=======
+import environ
+
+PROJECT_DIR = os.path.dirname(os.path.abspath(__file__))
+BASE_DIR = os.path.dirname(PROJECT_DIR)
+
+env = environ.Env(
+    SECRET_KEY=str,
+    DEBUG=(bool, False),
+    ALLOWED_HOSTS=(list, ['127.0.0.1:8000']),
+    DATABASE_URL=str,
+    
+    CORS_ORIGIN_ALLOW_ALL=bool,
+)
+
+>>>>>>> refs/remotes/origin/master
 
 
+environ.Env.read_env(os.path.join(BASE_DIR, '.env'))
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/2.2/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
+<<<<<<< HEAD
 SECRET_KEY = env('SECRET_KEY')
 DEBUG = env('DEBUG')
 # SECURITY WARNING: don't run with debug turned on in production!
 if DEBUG==False:
     ALLOWED_HOSTS=env("ALLOWED_HOSTS")
 
+=======
+# SECRET_KEY = 'i354m9o2xg%d3ny2vcqhqfx4s70^0-pggen$u0t!xlvgnr%&)4'
+# Raises django's ImproperlyConfigured exception if SECRET_KEY not in os.environ
+SECRET_KEY = env('SECRET_KEY')
 
+# SECURITY WARNING: don't run with debug turned on in production!
+# DEBUG = True
+# false in os.environ
+DEBUG = env('DEBUG')
+>>>>>>> refs/remotes/origin/master
+
+if DEBUG==False:
+    ALLOWED_HOSTS=env("ALLOWED_HOSTS")
 
 # Application definition
 
@@ -66,6 +101,7 @@ INSTALLED_APPS = [
     'rest_auth.registration',
     'django.contrib.sites',
     'allauth.account',
+    'rest_framework_swagger',
 ]
 
 MIDDLEWARE = [
@@ -102,12 +138,26 @@ TEMPLATES = [
 CORS_ORIGIN_WHITELIST =CORS_ORIGIN_WHITELIST=["https://example.com","https://sub.example.com","http://localhost:8080","http://localhost:4200"]
 WSGI_APPLICATION = 'oop_django.wsgi.application'
 
-
 # Database
 # https://docs.djangoproject.com/en/2.2/ref/settings/#databases
 DATABASES = {
+<<<<<<< HEAD
   'default': env.db(),
+=======
+    'default': env.db(),
+>>>>>>> refs/remotes/origin/master
 }
+# DATABASES = {
+#     'default': {
+#         'ENGINE': 'django.db.backends.mysql',
+#         'NAME': 'oop_project',
+#         'USER': 'root',
+#         'PASSWORD': '',
+#         'HOST': '',
+#         'PORT': '',
+#     }
+# }
+
 
 # Password validation
 # https://docs.djangoproject.com/en/2.2/ref/settings/#auth-password-validators
@@ -117,7 +167,10 @@ SITE_ID = 1
 
 # CORS
 CORS_ORIGIN_ALLOW_ALL = env('CORS_ORIGIN_ALLOW_ALL')
+<<<<<<< HEAD
 
+=======
+>>>>>>> refs/remotes/origin/master
 
 # Internationalization
 # https://docs.djangoproject.com/en/2.2/topics/i18n/
@@ -131,7 +184,6 @@ USE_I18N = True
 USE_L10N = True
 
 USE_TZ = True
-
 
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/2.2/howto/static-files/
