@@ -12,20 +12,39 @@ https://docs.djangoproject.com/en/2.2/ref/settings/
 
 import os
 
+
+import environ
+
+PROJECT_DIR = os.path.dirname(os.path.abspath(__file__))
+BASE_DIR = os.path.dirname(PROJECT_DIR)
+
+env = environ.Env(
+    SECRET_KEY=str,
+    DEBUG=(bool, False),
+    ALLOWED_HOSTS=(list, ['127.0.0.1:8000']),
+    DATABASE_URL=str,
+    AUTH_PASSWORD_VALIDATORS=list,
+    CORS_ORIGIN_ALLOW_ALL=bool,
+)
+
+
+
+environ.Env.read_env(os.path.join(BASE_DIR, '.env'))
+
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
-BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+
 
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/2.2/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'i354m9o2xg%d3ny2vcqhqfx4s70^0-pggen$u0t!xlvgnr%&)4'
-
+SECRET_KEY = env('SECRET_KEY')
+DEBUG = env('DEBUG')
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+if DEBUG==False:
+    ALLOWED_HOSTS=env("ALLOWED_HOSTS")
 
-ALLOWED_HOSTS = ['*']
 
 
 # Application definition
@@ -80,50 +99,24 @@ TEMPLATES = [
     },
 ]
 
-CORS_ORIGIN_WHITELIST = [
-    "https://example.com",
-    "https://sub.example.com",
-    "http://localhost:8080",
-    "http://localhost:4200"
-]
-
+CORS_ORIGIN_WHITELIST =CORS_ORIGIN_WHITELIST=["https://example.com","https://sub.example.com","http://localhost:8080","http://localhost:4200"]
 WSGI_APPLICATION = 'oop_django.wsgi.application'
 
 
 # Database
 # https://docs.djangoproject.com/en/2.2/ref/settings/#databases
 DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.mysql',
-        'NAME': 'oop_project',
-        'USER': 'root',
-        'PASSWORD': '',
-        'HOST': '',
-        'PORT': '',
-    }
+  'default': env.db(),
 }
 
 # Password validation
 # https://docs.djangoproject.com/en/2.2/ref/settings/#auth-password-validators
 
-AUTH_PASSWORD_VALIDATORS = [
-    {
-        'NAME': 'django.contrib.auth.password_validation.UserAttributeSimilarityValidator',
-    },
-    {
-        'NAME': 'django.contrib.auth.password_validation.MinimumLengthValidator',
-    },
-    {
-        'NAME': 'django.contrib.auth.password_validation.CommonPasswordValidator',
-    },
-    {
-        'NAME': 'django.contrib.auth.password_validation.NumericPasswordValidator',
-    },
-]
+AUTH_PASSWORD_VALIDATORS = env("AUTH_PASSWORD_VALIDATORS")
 SITE_ID = 1
 
 # CORS
-CORS_ORIGIN_ALLOW_ALL = True
+CORS_ORIGIN_ALLOW_ALL = env('CORS_ORIGIN_ALLOW_ALL')
 
 
 # Internationalization
@@ -142,8 +135,8 @@ USE_TZ = True
 
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/2.2/howto/static-files/
-STATIC_ROOT = os.path.join(BASE_DIR, 'static')
-STATIC_URL = '/static/'
+STATIC_ROOT = env('STATIC_ROOT')
+STATIC_URL = env('STATIC_URL')
 
 AUTH_USER_MODEL = 'store.Customer'
 
@@ -156,8 +149,8 @@ REST_AUTH_REGISTER_SERIALIZERS = {
 
 EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
 
-MEDIA_URL = '/media/'
-MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
+MEDIA_URL = env('MEDIA_URL')
+MEDIA_ROOT = env('MEDIA_ROOT')
 
 REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': (
