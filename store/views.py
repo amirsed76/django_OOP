@@ -21,6 +21,7 @@ import uuid
 import random
 import math
 from rest_auth.views import LoginView
+from rest_framework import permissions
 
 class CustomerLoginView(LoginView):
     def post(self, request, *args, **kwargs):
@@ -269,3 +270,9 @@ class BasketViewSet(viewsets.ModelViewSet):
     def get_queryset(self):
         queryset = models.Basket.objects.filter(customer=self.request.user)
         return queryset
+
+class LoggedIn(generics.GenericAPIView):
+    permission_classes = [permissions.IsAuthenticated]
+
+    def get(self, request, *args, **kwargs):
+        return Response(status=status.HTTP_200_OK)
