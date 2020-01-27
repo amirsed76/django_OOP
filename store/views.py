@@ -132,11 +132,6 @@ class ProductDetail(mixins.RetrieveModelMixin, generics.GenericAPIView):
         return self.retrieve(request, *args, **kwargs)
 
 
-#
-# class CustomerViewSet(viewsets.ModelViewSet):
-#     serializer_class = serializers.CustomUserDetailsSerializer
-#     queryset = models.Customer.objects.all()
-
 class SalesmanDetail(mixins.RetrieveModelMixin, generics.GenericAPIView):
     serializer_class = serializers.SalesmanSerializer
     queryset = models.Salesman.objects.all()
@@ -207,11 +202,7 @@ class LastBasketViewSet(viewsets.ModelViewSet):
     queryset = models.Basket.objects.all()
     permission_classes = [permissions.IsAuthenticated]
     def get_queryset(self):
-        try:
-            queryset = models.Basket.objects.filter(customer=self.request.user)[-1]
-        except:
-            queryset=[]
-        return queryset
+        return models.Basket.objects.filter(customer=self.request.user, paymentStatus='pr')
 
 
 class BasketView(generics.ListAPIView):
@@ -229,21 +220,7 @@ class LoggedIn(generics.GenericAPIView):
     def get(self, request, *args, **kwargs):
         return Response(status=status.HTTP_200_OK)
 
-#
-# @api_view(['GET'])
-# def comment_permition(request , product):
-#     basket_list = models.Basket.objects.all().filter(customer=request.user)
-#     for basket in basket_list:
-#         basket_product_list = models.BasketProduct.objects.all().filter(basket=basket)
-#         for basket_product in basket_product_list:
-#             u_product = getattr(basket_product , product)
-#             if u_product == product:
-#                 return Response({'permission':True})
-#     return Response({'permission':False})
-#
 
-
-# class EditComment(mixins.RetrieveModelMixin,mixins.UpdateModelMixin , mixins.DestroyModelMixin , generics.GenericAPIView):
 class MyComments(generics.ListAPIView):
     serializer_class = serializers.CommentSerializer
     queryset = models.Comment.objects.all()
