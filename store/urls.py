@@ -6,12 +6,6 @@ from django.urls import path, include,re_path
 
 router = routers.DefaultRouter()
 
-# router.register(r'products', views.ProductViewSet)
-# router.register(r'product_images', views.ProductImageViewSet)
-# router.register(r'salesmans', views.SalesmanViewSet)
-# router.register(r'products', views.ProductView)
-# router.register(r'product_images', views.ProductImageView)
-# router.register(r'salesmans', views.SalesmanView)
 router.register(r'basketproducts', views.BasketProductViewSet)
 router.register(r'baskets', views.BasketViewSet)
 router.register(r'customers', views.CustomerViewSet)
