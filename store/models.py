@@ -129,3 +129,7 @@ class BasketProduct(models.Model):
     def __str__(self):
         return '({}, {} , {},{})'.format(self.product.name , self.basket.customer , self.count,self.basket)
 
+class Comment(models.Model):
+    text = models.TextField(blank=True , null=True)
+    product = models.ForeignKey(Product , on_delete=models.CASCADE)
+    user = models.ForeignKey(User , on_delete=models.CASCADE)

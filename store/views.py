@@ -3,8 +3,9 @@ from rest_framework.decorators import api_view
 from itertools import chain
 from rest_framework import pagination
 from rest_auth.registration.views import RegisterView
-
+import datetime
 from . import models
+from .models import Salesman, Basket, BasketProduct
 from . import serializers
 from rest_framework import viewsets
 from rest_framework import response
@@ -19,54 +20,75 @@ from rest_framework import mixins
 import uuid
 import random
 import math
+from rest_auth.views import LoginView
+from rest_framework import permissions
+from . import permission
 
+class CustomerLoginView(LoginView):
+    def post(self, request, *args, **kwargs):
+        keep = request.data.get('keep', None)
+        if not keep:
+            request.session.set_expiry(0)
+
+        return super().post(request, *args, **kwargs)
+
+
+@api_view(['GET'])
+def purchase_list(request):
+    completed_baskets = Basket.objects.filter(customer=request.user, paymentStatus="co")
+    basket_products = BasketProduct.objects.filter(basket__in=completed_baskets)
+    basket_product_serializer = serializers.BasketProductSerializer(basket_products, many=True)
+    return Response(basket_product_serializer.data)
 
 
 @api_view(['GET'])
 def confirm_basket(request):
-    user_basket=models.Basket.objects.get(customer=request.user , paymentStatus="pr")
-    basket_products=models.BasketProduct.objects.filter(basket=user_basket,state="pr")
+    user_basket = models.Basket.objects.get(customer=request.user, paymentStatus="pr")
+    basket_products = models.BasketProduct.objects.filter(basket=user_basket, state="pr")
 
-    products_serializer=serializers.BasketProductSerializer(basket_products,many=True)
+    products_serializer = serializers.BasketProductSerializer(basket_products, many=True)
     return Response(products_serializer.data)
 
-@api_view(['POST'])
+
+@api_view(['POST', 'GET'])
 def purchase(request):
-    rand=random.random()
-    successfull=False
-    if rand<.80:
-        successfull=True
-        tracking_code=math.floor(random.random()*1000000)
-        user_basket=models.Basket.objects.get(customer=request.user , paymentStatus="pr")
-        basket_products=models.BasketProduct.objects.filter(basket=user_basket,state="pr")
+    try:
+        user_basket = models.Basket.objects.get(customer=request.user, paymentStatus="pr")
+    except:
+        return Response(status=status.HTTP_404_NOT_FOUND)
+    basket_products = models.BasketProduct.objects.filter(basket=user_basket, state="pr")
+    if request.method == 'GET':
+        total_price = 0
         for basket_product in basket_products:
-            basket_product.product.count-=basket_product.count
+            total_price += basket_product.count * basket_product.product.Price
+
+        return Response({"total_price": total_price})
+
+    rand = random.random()
+    successfull = False
+    if rand < .80:
+        successfull = True
+        tracking_code = math.floor(random.random() * 1000000)
+        for basket_product in basket_products:
+            basket_product.product.count -= basket_product.count
             basket_product.product.save()
 
-        user_basket.paymentStatus="co"
+        user_basket.paymentStatus = "co"
+        user_basket.trackingCode = tracking_code
+        user_basket.payTime = datetime.datetime.now()
         user_basket.save()
-        return Response({"successfull":successfull,"tracking_code":tracking_code})
+        return Response({"successfull": successfull, "tracking_code": tracking_code})
+
+    return Response({"successfull": successfull},status=status.HTTP_400_BAD_REQUEST)
 
 
-    return Response({"successfull":successfull})
+@api_view(["GET"])
+def communicate_seller(request, id):
+    seller = Salesman.objects.get(id=id)
+    salesman_serializer = serializers.SalesmanSerializer(seller)
+    return Response(salesman_serializer.data)
 
 
-# class get_basket(APIView):
-#     def get(self, request, *args, **kwargs):
-#         exist = True
-#         list1 = [{"goods_id": 13, "number": 5, "sum": 13000}, {"goods_id": 14, "number": 3, "sum": 75000}]
-#
-#         # exist=False
-#         # list1=[]
-#         return Response({"exist": exist, "content": list1})
-
-
-# class ProductDetailView(generics.RetrieveAPIView):
-#     queryset = models.Product.objects.all()
-#     serializer_class = serializers.ProductSerializer
-#     lookup_field = 'id'
-
-#
 class ProductImages(generics.ListAPIView):
     queryset = models.ProductImage.objects.all()
     serializer_class = serializers.ProductImageSerializer
@@ -75,60 +97,6 @@ class ProductImages(generics.ListAPIView):
         pics = models.ProductImage.objects.filter(product__id=pk)
         serializer = self.serializer_class(pics, many=True)
         return response.Response(serializer.data)
-
-
-#
-# @api_view(['GET'])
-# def search(request, searched):
-#     products = models.Product.objects.filter(
-#         name__contains=searched).order_by('recordTime')[0:10]
-#     serializer = serializers.ProductSerializer(products, many=True)
-#     return Response(serializer.data)
-
-#
-# @api_view(['GET'])
-# def searching(request, searched):
-#     searched_length = len(searched)
-#     products = models.Product.objects.filter(
-#         name__contains=searched).order_by('recordTime')
-#
-#     for k in range(0, searched_length + 1):
-#         products_length = len(products)
-#
-#         if products_length > 2:
-#
-#             serializer = serializers.ProductSerializer(products[0:2], many=True)
-#             return Response(serializer.data)
-#
-#
-#         else:
-#             new_products = models.Product.objects.filter(
-#                 name__contains=searched[0:searched_length - k - 1]).order_by('recordTime')
-#             products = list(chain(products, new_products))
-
-# @api_view(['GET'])
-# def showproducts(request,cat):
-#     paginator = pagination.PageNumberPagination()
-#     paginator.page_size = 2
-#     product_list=models.Product.objects.all().filter(category=cat)
-#     result_page = paginator.paginate_queryset(product_list, request)
-#     serializer = serializers.ProductSerializer(result_page, many=True)
-#     return paginator.get_paginated_response(serializer.data)
-
-
-# @api_view(['GET'])
-# def deleteBasketItem(request,itemID):
-#     item=models.BasketProduct.objects.get(pk=itemID)
-#     item.count-=1
-#     if item.count==0:
-#         item.delete()
-#         return Response({"item":"item deleted","delete":True})
-#     else:
-#         item.save()
-#         serializer=models.BasketProductSerializer(item)
-#         return Response({"item":serializer.data,"deleted":False})
-#
-
 
 
 class GetCategories(generics.ListAPIView):
@@ -164,10 +132,10 @@ class ProductDetail(mixins.RetrieveModelMixin, generics.GenericAPIView):
         return self.retrieve(request, *args, **kwargs)
 
 
-class CustomerViewSet(viewsets.ModelViewSet):
-    serializer_class = serializers.CustomUserDetailsSerializer
-    queryset = models.Customer.objects.all()
-
+#
+# class CustomerViewSet(viewsets.ModelViewSet):
+#     serializer_class = serializers.CustomUserDetailsSerializer
+#     queryset = models.Customer.objects.all()
 
 class SalesmanDetail(mixins.RetrieveModelMixin, generics.GenericAPIView):
     serializer_class = serializers.SalesmanSerializer
@@ -204,6 +172,7 @@ class ProductImageDetail(mixins.RetrieveModelMixin, generics.GenericAPIView):
 class BasketProductViewSet(viewsets.ModelViewSet):
     serializer_class = serializers.BasketProductSerializer
     queryset = models.BasketProduct.objects.all()
+    permission_classes = [permissions.IsAuthenticated]
 
     def get_queryset(self):
         queryset = models.BasketProduct.objects.filter(basket__customer=self.request.user)
@@ -224,6 +193,7 @@ class BasketProductViewSet(viewsets.ModelViewSet):
 
 
 class FinalPayment(APIView):
+    permission_classes = [permissions.IsAuthenticated]
     def put(self, request, *args, **kwargs):
         basket = models.Basket.objects.filter(customer=request.user)
         basket.paymentStatus = "co"
@@ -232,10 +202,84 @@ class FinalPayment(APIView):
         return response
 
 
-class BasketViewSet(viewsets.ModelViewSet):
+class LastBasketViewSet(viewsets.ModelViewSet):
     serializer_class = serializers.BasketSerializer
-    queryset  = models.Basket.objects.all()
+    queryset = models.Basket.objects.all()
+    permission_classes = [permissions.IsAuthenticated]
+    def get_queryset(self):
+        try:
+            queryset = models.Basket.objects.filter(customer=self.request.user)[-1]
+        except:
+            queryset=[]
+        return queryset
 
+
+class BasketView(generics.ListAPIView):
+    serializer_class = serializers.BasketSerializer
+    queryset = models.Basket.objects.all()
+    permission_classes = [permissions.IsAuthenticated]
     def get_queryset(self):
         queryset = models.Basket.objects.filter(customer=self.request.user)
         return queryset
+
+
+class LoggedIn(generics.GenericAPIView):
+    permission_classes = [permissions.IsAuthenticated]
+
+    def get(self, request, *args, **kwargs):
+        return Response(status=status.HTTP_200_OK)
+
+#
+# @api_view(['GET'])
+# def comment_permition(request , product):
+#     basket_list = models.Basket.objects.all().filter(customer=request.user)
+#     for basket in basket_list:
+#         basket_product_list = models.BasketProduct.objects.all().filter(basket=basket)
+#         for basket_product in basket_product_list:
+#             u_product = getattr(basket_product , product)
+#             if u_product == product:
+#                 return Response({'permission':True})
+#     return Response({'permission':False})
+#
+
+
+# class EditComment(mixins.RetrieveModelMixin,mixins.UpdateModelMixin , mixins.DestroyModelMixin , generics.GenericAPIView):
+class MyComments(generics.ListAPIView):
+    serializer_class = serializers.CommentSerializer
+    queryset = models.Comment.objects.all()
+
+    def get_queryset(self):
+        queryset = models.Comment.objects.filter(user=self.request.user)
+        return queryset
+
+
+class MyComment(generics.RetrieveUpdateDestroyAPIView ):
+    serializer_class = serializers.CommentSerializer
+    queryset = models.Comment.objects.all()
+
+    def get_queryset(self):
+        queryset = models.Comment.objects.filter(user=self.request.user)
+        return queryset
+
+class CreateComment(generics.CreateAPIView):
+    serializer_class = serializers.CommentSerializer
+    queryset = models.Comment.objects.all()
+    def post(self, request, *args, **kwargs):
+        product_id=request.data["product"]
+        basket_products=models.BasketProduct.objects.filter(basket__customer =request.user , product = product_id)
+        if len(basket_products) > 0 :
+            return super().post( request, *args, **kwargs)
+        else:
+            return Response(status=status.HTTP_403_FORBIDDEN)
+
+
+class MyComments(generics.ListAPIView):
+    serializer_class = serializers.CommentSerializer
+    queryset = models.Comment.objects.all()
+    def get(self, request,product, *args, **kwargs):
+        data=models.Comment.objects.filter(product=product)
+        print("DATA",data)
+        serializer_data = serializers.CommentSerializer(data, many=True)
+        print("SER",serializer_data)
+
+        return Response(serializer_data.data)

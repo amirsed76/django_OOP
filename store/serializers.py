@@ -21,7 +21,7 @@ class CustomRegisterSerializer(RegisterSerializer):
 class CustomUserDetailsSerializer(serializers.ModelSerializer):
     class Meta:
         model = models.User
-        fields = ('username', 'email')
+        fields = ('username', 'email', 'first_name', 'last_name')
         read_only_fields = ('username',)
 
 
@@ -53,10 +53,10 @@ class ProductImageSerializer(serializers.ModelSerializer):
 
 
 class BasketProductSerializer(serializers.ModelSerializer):
+    # product = ProductSerializer()
     class Meta:
         model = models.BasketProduct
-        fields = '__all__'
-
+        fields = ('basket','product','count','state')
 
 class SalesmanProfileImageSerializer(serializers.ModelSerializer):
     class Meta:
@@ -72,4 +72,9 @@ class SalesmanIdentificationImageSerializer(serializers.ModelSerializer):
 class CategorySerializer(serializers.ModelSerializer):
     class Meta :
         model= models.Category
+        fields = '__all__'
+
+class CommentSerializer(serializers.ModelSerializer):
+    class Meta :
+        model= models.Comment
         fields = '__all__'
