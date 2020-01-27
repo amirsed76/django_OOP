@@ -204,6 +204,11 @@ class LastBasketViewSet(viewsets.ModelViewSet):
     def get_queryset(self):
         return models.Basket.objects.filter(customer=self.request.user, paymentStatus='pr')
 
+    def create(self, request, *args, **kwargs):
+        if len(self.get_queryset()) > 0:
+            return Response({message: 'can not create another processing basket'},status=status.HTTP_400_BAD_REQUEST)
+        return super().create(request, *args, **kwargs)
+
 
 class BasketView(generics.ListAPIView):
     serializer_class = serializers.BasketSerializer
