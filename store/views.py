@@ -24,6 +24,7 @@ from rest_auth.views import LoginView
 from rest_framework import permissions
 from . import permission
 
+
 class CustomerLoginView(LoginView):
     def post(self, request, *args, **kwargs):
         keep = request.data.get('keep', None)
@@ -79,7 +80,7 @@ def purchase(request):
         user_basket.save()
         return Response({"successfull": successfull, "tracking_code": tracking_code})
 
-    return Response({"successfull": successfull},status=status.HTTP_400_BAD_REQUEST)
+    return Response({"successfull": successfull}, status=status.HTTP_400_BAD_REQUEST)
 
 
 @api_view(["GET"])
@@ -189,6 +190,7 @@ class BasketProductViewSet(viewsets.ModelViewSet):
 
 class FinalPayment(APIView):
     permission_classes = [permissions.IsAuthenticated]
+
     def put(self, request, *args, **kwargs):
         basket = models.Basket.objects.filter(customer=request.user)
         basket.paymentStatus = "co"
@@ -201,12 +203,13 @@ class LastBasketViewSet(viewsets.ModelViewSet):
     serializer_class = serializers.BasketSerializer
     queryset = models.Basket.objects.all()
     permission_classes = [permissions.IsAuthenticated]
+
     def get_queryset(self):
         return models.Basket.objects.filter(customer=self.request.user, paymentStatus='pr')
 
     def create(self, request, *args, **kwargs):
         if len(self.get_queryset()) > 0:
-            return Response({message: 'can not create another processing basket'},status=status.HTTP_400_BAD_REQUEST)
+            return Response({'message': 'can not create another processing basket'}, status=status.HTTP_400_BAD_REQUEST)
         return super().create(request, *args, **kwargs)
 
 
@@ -214,6 +217,7 @@ class BasketView(generics.ListAPIView):
     serializer_class = serializers.BasketSerializer
     queryset = models.Basket.objects.all()
     permission_classes = [permissions.IsAuthenticated]
+
     def get_queryset(self):
         queryset = models.Basket.objects.filter(customer=self.request.user)
         return queryset
@@ -235,7 +239,7 @@ class MyComments(generics.ListAPIView):
         return queryset
 
 
-class MyComment(generics.RetrieveUpdateDestroyAPIView ):
+class MyComment(generics.RetrieveUpdateDestroyAPIView):
     serializer_class = serializers.CommentSerializer
     queryset = models.Comment.objects.all()
 
@@ -243,14 +247,16 @@ class MyComment(generics.RetrieveUpdateDestroyAPIView ):
         queryset = models.Comment.objects.filter(user=self.request.user)
         return queryset
 
+
 class CreateComment(generics.CreateAPIView):
     serializer_class = serializers.CommentSerializer
     queryset = models.Comment.objects.all()
+
     def post(self, request, *args, **kwargs):
-        product_id=request.data["product"]
-        basket_products=models.BasketProduct.objects.filter(basket__customer =request.user , product = product_id)
-        if len(basket_products) > 0 :
-            return super().post( request, *args, **kwargs)
+        product_id = request.data["product"]
+        basket_products = models.BasketProduct.objects.filter(basket__customer=request.user, product=product_id)
+        if len(basket_products) > 0:
+            return super().post(request, *args, **kwargs)
         else:
             return Response(status=status.HTTP_403_FORBIDDEN)
 
@@ -258,10 +264,11 @@ class CreateComment(generics.CreateAPIView):
 class MyComments(generics.ListAPIView):
     serializer_class = serializers.CommentSerializer
     queryset = models.Comment.objects.all()
-    def get(self, request,product, *args, **kwargs):
-        data=models.Comment.objects.filter(product=product)
-        print("DATA",data)
+
+    def get(self, request, product, *args, **kwargs):
+        data = models.Comment.objects.filter(product=product)
+        print("DATA", data)
         serializer_data = serializers.CommentSerializer(data, many=True)
-        print("SER",serializer_data)
+        print("SER", serializer_data)
 
         return Response(serializer_data.data)
