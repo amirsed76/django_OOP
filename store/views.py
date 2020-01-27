@@ -21,34 +21,52 @@ import random
 import math
 
 
+
 @api_view(['GET'])
 def confirm_basket(request):
-    user_basket = models.Basket.objects.get(customer=request.user, paymentStatus="pr")
-    basket_products = models.BasketProduct.objects.filter(basket=user_basket, state="pr")
-    products_serializer = serializers.BasketProductSerializer(basket_products, many=True)
-    return Response(products_serializer.data)
+    user_basket=models.Basket.objects.get(customer=request.user , paymentStatus="pr")
+    basket_products=models.BasketProduct.objects.filter(basket=user_basket,state="pr")
 
+    products_serializer=serializers.BasketProductSerializer(basket_products,many=True)
+    return Response(products_serializer.data)
 
 @api_view(['POST'])
 def purchase(request):
-    rand = random.random()
-    successfull = False
-    if rand < .80:
-        successfull = True
-        tracking_code = math.floor(random.random() * 1000000)
-        user_basket = models.Basket.objects.get(customer=request.user, paymentStatus="pr")
-        basket_products = models.BasketProduct.objects.filter(basket=user_basket, state="pr")
+    rand=random.random()
+    successfull=False
+    if rand<.80:
+        successfull=True
+        tracking_code=math.floor(random.random()*1000000)
+        user_basket=models.Basket.objects.get(customer=request.user , paymentStatus="pr")
+        basket_products=models.BasketProduct.objects.filter(basket=user_basket,state="pr")
         for basket_product in basket_products:
-            basket_product.product.count -= basket_product.count
+            basket_product.product.count-=basket_product.count
             basket_product.product.save()
 
-        user_basket.paymentStatus = "co"
+        user_basket.paymentStatus="co"
         user_basket.save()
-        return Response({"successfull": successfull, "tracking_code": tracking_code})
-
-    return Response({"successfull": successfull})
+        return Response({"successfull":successfull,"tracking_code":tracking_code})
 
 
+    return Response({"successfull":successfull})
+
+
+# class get_basket(APIView):
+#     def get(self, request, *args, **kwargs):
+#         exist = True
+#         list1 = [{"goods_id": 13, "number": 5, "sum": 13000}, {"goods_id": 14, "number": 3, "sum": 75000}]
+#
+#         # exist=False
+#         # list1=[]
+#         return Response({"exist": exist, "content": list1})
+
+
+# class ProductDetailView(generics.RetrieveAPIView):
+#     queryset = models.Product.objects.all()
+#     serializer_class = serializers.ProductSerializer
+#     lookup_field = 'id'
+
+#
 class ProductImages(generics.ListAPIView):
     queryset = models.ProductImage.objects.all()
     serializer_class = serializers.ProductImageSerializer
@@ -57,6 +75,60 @@ class ProductImages(generics.ListAPIView):
         pics = models.ProductImage.objects.filter(product__id=pk)
         serializer = self.serializer_class(pics, many=True)
         return response.Response(serializer.data)
+
+
+#
+# @api_view(['GET'])
+# def search(request, searched):
+#     products = models.Product.objects.filter(
+#         name__contains=searched).order_by('recordTime')[0:10]
+#     serializer = serializers.ProductSerializer(products, many=True)
+#     return Response(serializer.data)
+
+#
+# @api_view(['GET'])
+# def searching(request, searched):
+#     searched_length = len(searched)
+#     products = models.Product.objects.filter(
+#         name__contains=searched).order_by('recordTime')
+#
+#     for k in range(0, searched_length + 1):
+#         products_length = len(products)
+#
+#         if products_length > 2:
+#
+#             serializer = serializers.ProductSerializer(products[0:2], many=True)
+#             return Response(serializer.data)
+#
+#
+#         else:
+#             new_products = models.Product.objects.filter(
+#                 name__contains=searched[0:searched_length - k - 1]).order_by('recordTime')
+#             products = list(chain(products, new_products))
+
+# @api_view(['GET'])
+# def showproducts(request,cat):
+#     paginator = pagination.PageNumberPagination()
+#     paginator.page_size = 2
+#     product_list=models.Product.objects.all().filter(category=cat)
+#     result_page = paginator.paginate_queryset(product_list, request)
+#     serializer = serializers.ProductSerializer(result_page, many=True)
+#     return paginator.get_paginated_response(serializer.data)
+
+
+# @api_view(['GET'])
+# def deleteBasketItem(request,itemID):
+#     item=models.BasketProduct.objects.get(pk=itemID)
+#     item.count-=1
+#     if item.count==0:
+#         item.delete()
+#         return Response({"item":"item deleted","delete":True})
+#     else:
+#         item.save()
+#         serializer=models.BasketProductSerializer(item)
+#         return Response({"item":serializer.data,"deleted":False})
+#
+
 
 
 class GetCategories(generics.ListAPIView):
@@ -162,7 +234,7 @@ class FinalPayment(APIView):
 
 class BasketViewSet(viewsets.ModelViewSet):
     serializer_class = serializers.BasketSerializer
-    queryset = models.Basket.objects.all()
+    queryset  = models.Basket.objects.all()
 
     def get_queryset(self):
         queryset = models.Basket.objects.filter(customer=self.request.user)
