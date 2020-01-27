@@ -19,14 +19,14 @@ environ.Env.read_env(os.path.join(BASE_DIR, '.env'))
 PROJECT_DIR = os.path.dirname(os.path.abspath(__file__))
 BASE_DIR = os.path.dirname(PROJECT_DIR)
 
-# env = environ.Env(
-#     SECRET_KEY=str,
-#     DEBUG=(bool, False),
-#     ALLOWED_HOSTS=(list, ['127.0.0.1:8000']),
-#     DATABASE_URL=str,
-#
-#     CORS_ORIGIN_ALLOW_ALL=bool,
-# )
+env = environ.Env(
+    SECRET_KEY=str,
+    DEBUG=(bool, False),
+    ALLOWED_HOSTS=(list, ['127.0.0.1:8000']),
+    DATABASE_URL=str,
+
+    CORS_ORIGIN_ALLOW_ALL=bool,
+)
 
 
 
@@ -104,21 +104,21 @@ WSGI_APPLICATION = 'oop_django.wsgi.application'
 
 # Database
 # https://docs.djangoproject.com/en/2.2/ref/settings/#databases
-# DATABASES = {
-#
-#     'default': env.db(),
-#
-# }
 DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.mysql',
-        'NAME': 'oop_project',
-        'USER': 'root',
-        'PASSWORD': '',
-        'HOST': '',
-        'PORT': '',
-    }
+
+    'default': env.db(),
+
 }
+# DATABASES = {
+#     'default': {
+#         'ENGINE': 'django.db.backends.mysql',
+#         'NAME': 'oop_project',
+#         'USER': 'root',
+#         'PASSWORD': '',
+#         'HOST': '',
+#         'PORT': '',
+#     }
+# }
 
 
 # Password validation
