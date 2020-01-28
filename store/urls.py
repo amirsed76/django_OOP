@@ -27,10 +27,9 @@ urlpatterns = [
     path('purchase_list/',views.purchase_list,name='purchase_list'),
     path('logged-in/', views.LoggedIn.as_view()),
     path("baskets/",views.BasketView.as_view()),
-    # path('ShowTrackingCode/<int:id>/', views.ShowTrackingCode, name="ShowTrackingCode"),
     path('my_comment/', views.MyComments.as_view()),
     path('my_comment/<int:pk>', views.MyComment.as_view()),
     path('create_comment/', views.CreateComment.as_view()),
-    path('comment/<int:product>', views.MyComments.as_view()),
-
+    path('productComments/<int:product>', views.MyComments.as_view()),
+    path('colors/', views.GetColors.as_view(), name="color"),
 ]

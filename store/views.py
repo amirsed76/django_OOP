@@ -1,5 +1,5 @@
 from rest_framework.response import Response
-from rest_framework.decorators import api_view
+from rest_framework.decorators import api_view, permission_classes
 from itertools import chain
 from rest_framework import pagination
 from rest_auth.registration.views import RegisterView
@@ -35,6 +35,7 @@ class CustomerLoginView(LoginView):
 
 
 @api_view(['GET'])
+@permission_classes([permissions.IsAuthenticated])
 def purchase_list(request):
     completed_baskets = Basket.objects.filter(customer=request.user, paymentStatus="co")
     basket_products = BasketProduct.objects.filter(basket__in=completed_baskets)
@@ -43,6 +44,7 @@ def purchase_list(request):
 
 
 @api_view(['GET'])
+@permission_classes([permissions.IsAuthenticated])
 def confirm_basket(request):
     user_basket = models.Basket.objects.get(customer=request.user, paymentStatus="pr")
     basket_products = models.BasketProduct.objects.filter(basket=user_basket, state="pr")
@@ -52,6 +54,7 @@ def confirm_basket(request):
 
 
 @api_view(['POST', 'GET'])
+@permission_classes([permissions.IsAuthenticated])
 def purchase(request):
     try:
         user_basket = models.Basket.objects.get(customer=request.user, paymentStatus="pr")
@@ -219,7 +222,7 @@ class BasketView(generics.ListAPIView):
     permission_classes = [permissions.IsAuthenticated]
 
     def get_queryset(self):
-        queryset = models.Basket.objects.filter(customer=self.request.user)
+        queryset = models.Basket.objects.filter(customer=self.request.user, paymentStatus='co')
         return queryset
 
 
@@ -261,7 +264,7 @@ class CreateComment(generics.CreateAPIView):
             return Response(status=status.HTTP_403_FORBIDDEN)
 
 
-class MyComments(generics.ListAPIView):
+class productComments(generics.ListAPIView):
     serializer_class = serializers.CommentSerializer
     queryset = models.Comment.objects.all()
 
@@ -272,3 +275,8 @@ class MyComments(generics.ListAPIView):
         print("SER", serializer_data)
 
         return Response(serializer_data.data)
+
+
+class GetColors(generics.ListAPIView):
+    queryset = models.Color.objects.all()
+    serializer_class = serializers.ColorSerializer

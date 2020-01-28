@@ -78,3 +78,9 @@ class CommentSerializer(serializers.ModelSerializer):
     class Meta :
         model= models.Comment
         fields = '__all__'
+
+
+class ColorSerializer(serializers.ModelSerializer):
+    class Meta :
+        model= models.Color
+        fields = '__all__'
