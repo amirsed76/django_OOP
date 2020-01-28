@@ -1,6 +1,7 @@
 import os
 import environ
 
+
 PROJECT_DIR = os.path.dirname(os.path.abspath(__file__))
 BASE_DIR = os.path.dirname(PROJECT_DIR)
 env = environ.Env(
@@ -11,41 +12,12 @@ env = environ.Env(
     AUTH_PASSWORD_VALIDATORS=list,
     CORS_ORIGIN_ALLOW_ALL=bool,
 )
-
-environ.Env.read_env(os.path.join(BASE_DIR, '.env'))
-
-
-
-PROJECT_DIR = os.path.dirname(os.path.abspath(__file__))
-BASE_DIR = os.path.dirname(PROJECT_DIR)
-
-env = environ.Env(
-    SECRET_KEY=str,
-    DEBUG=(bool, False),
-    ALLOWED_HOSTS=(list, ['127.0.0.1:8000']),
-    DATABASE_URL=str,
-
-    CORS_ORIGIN_ALLOW_ALL=bool,
-)
-
-
-
-
+environ.Env.read_env()
 
 SECRET_KEY = env('SECRET_KEY')
 DEBUG = env('DEBUG')
 
-if DEBUG==False:
-    ALLOWED_HOSTS=env("ALLOWED_HOSTS")
-
-
-
-
-
-
-if DEBUG==False:
-    ALLOWED_HOSTS=env("ALLOWED_HOSTS")
-
+ALLOWED_HOSTS=env("ALLOWED_HOSTS")
 
 
 INSTALLED_APPS = [
@@ -73,8 +45,6 @@ MIDDLEWARE = [
     'django.middleware.common.CommonMiddleware',
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
-    'corsheaders.middleware.CorsMiddleware',
-    'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
@@ -99,7 +69,7 @@ TEMPLATES = [
     },
 ]
 
-CORS_ORIGIN_WHITELIST =CORS_ORIGIN_WHITELIST=["https://example.com","https://sub.example.com","http://localhost:8080","http://localhost:4200"]
+CORS_ORIGIN_WHITELIST=["https://example.com","https://sub.example.com","http://localhost:8080","http://localhost:4200"]
 WSGI_APPLICATION = 'oop_django.wsgi.application'
 
 # Database
