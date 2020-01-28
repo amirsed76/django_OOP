@@ -28,8 +28,8 @@ urlpatterns = [
     path('logged-in/', views.LoggedIn.as_view()),
     path("baskets/",views.BasketView.as_view()),
     path('my_comment/', views.MyComments.as_view()),
-    path('my_comment/<int:pk>', views.MyComment.as_view()),
+    path('my_comment/<int:pk>/', views.MyComment.as_view()),
     path('create_comment/', views.CreateComment.as_view()),
-    path('productComments/<int:product>', views.MyComments.as_view()),
+    path('product-comment/<int:product>/', views.productComments.as_view()),
     path('colors/', views.GetColors.as_view(), name="color"),
 ]

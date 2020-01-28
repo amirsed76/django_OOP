@@ -132,4 +132,4 @@ class BasketProduct(models.Model):
 class Comment(models.Model):
     text = models.TextField(blank=True , null=True)
     product = models.ForeignKey(Product , on_delete=models.CASCADE)
-    user = models.ForeignKey(User , on_delete=models.CASCADE)
+    customer = models.ForeignKey(Customer , on_delete=models.CASCADE)

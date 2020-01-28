@@ -179,6 +179,8 @@ class BasketProductViewSet(viewsets.ModelViewSet):
 
     @transaction.atomic
     def create(self, request, *args, **kwargs):
+        _mutable = request.data._mutable
+        request.data._mutable = True
         product_id = request.data['product']
         product = models.Product.objects.filter(id=product_id)
         if not product:
@@ -187,6 +189,9 @@ class BasketProductViewSet(viewsets.ModelViewSet):
         count = int(request.data['count'])
         if product.count < count:
             return response.Response({'message': 'product count exceeded'}, status=status.HTTP_400_BAD_REQUEST)
+
+        request.data['basket'] = models.Basket.objects.get(customer=request.user, paymentStatus='pr').pk
+        request.data._mutable = _mutable
 
         return super().create(request, *args, **kwargs)
 
@@ -211,10 +216,13 @@ class LastBasketViewSet(viewsets.ModelViewSet):
         return models.Basket.objects.filter(customer=self.request.user, paymentStatus='pr')
 
     def create(self, request, *args, **kwargs):
+        _mutable = request.data._mutable
+        request.data._mutable = True
         if len(self.get_queryset()) > 0:
             return Response({'message': 'can not create another processing basket'}, status=status.HTTP_400_BAD_REQUEST)
         request.data['customer'] = request.user.id
         request.data['paymentStatus'] = 'pr'
+        request.data._mutable = _mutable
         return super().create(request, *args, **kwargs)
 
 
@@ -240,7 +248,7 @@ class MyComments(generics.ListAPIView):
     queryset = models.Comment.objects.all()
 
     def get_queryset(self):
-        queryset = models.Comment.objects.filter(user=self.request.user)
+        queryset = models.Comment.objects.filter(customer=self.request.user)
         return queryset
 
 
@@ -249,7 +257,7 @@ class MyComment(generics.RetrieveUpdateDestroyAPIView):
     queryset = models.Comment.objects.all()
 
     def get_queryset(self):
-        queryset = models.Comment.objects.filter(user=self.request.user)
+        queryset = models.Comment.objects.filter(customer=self.request.user)
         return queryset
 
 
@@ -258,9 +266,14 @@ class CreateComment(generics.CreateAPIView):
     queryset = models.Comment.objects.all()
 
     def post(self, request, *args, **kwargs):
+        _mutable = request.data._mutable
+        request.data._mutable = True
+
         product_id = request.data["product"]
         basket_products = models.BasketProduct.objects.filter(basket__customer=request.user, product=product_id)
         if len(basket_products) > 0:
+            request.data['customer'] = request.user.id
+            request.data._mutable = _mutable 
             return super().post(request, *args, **kwargs)
         else:
             return Response(status=status.HTTP_403_FORBIDDEN)
@@ -272,9 +285,7 @@ class productComments(generics.ListAPIView):
 
     def get(self, request, product, *args, **kwargs):
         data = models.Comment.objects.filter(product=product)
-        print("DATA", data)
         serializer_data = serializers.CommentSerializer(data, many=True)
-        print("SER", serializer_data)
 
         return Response(serializer_data.data)
 

@@ -48,12 +48,10 @@ class ProductSerializer(serializers.ModelSerializer):
 class ProductImageSerializer(serializers.ModelSerializer):
     class Meta:
         model = models.ProductImage
-        # fields = ['id', 'imageContent']
         fields='__all__'
 
 
 class BasketProductSerializer(serializers.ModelSerializer):
-    # product = ProductSerializer()
     class Meta:
         model = models.BasketProduct
         fields = ('basket','product','count','state')
