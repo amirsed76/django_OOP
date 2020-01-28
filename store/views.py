@@ -213,6 +213,8 @@ class LastBasketViewSet(viewsets.ModelViewSet):
     def create(self, request, *args, **kwargs):
         if len(self.get_queryset()) > 0:
             return Response({'message': 'can not create another processing basket'}, status=status.HTTP_400_BAD_REQUEST)
+        request.data['customer'] = request.user.id
+        request.data['paymentStatus'] = 'pr'
         return super().create(request, *args, **kwargs)
 
 
