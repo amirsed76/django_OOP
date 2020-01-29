@@ -13,7 +13,7 @@ env = environ.Env(
     AUTH_PASSWORD_VALIDATORS=list,
     CORS_ORIGIN_ALLOW_ALL=bool,
 )
-environ.Env.read_env(".env")
+environ.Env.read_env()
 
 SECRET_KEY = env('SECRET_KEY')
 DEBUG = env('DEBUG')
@@ -81,6 +81,7 @@ DATABASES = {
     'default': env.db(),
 
 }
+print(DATABASES)
 # DATABASES = {
 #     'default': {
 #         'ENGINE': 'django.db.backends.mysql',
