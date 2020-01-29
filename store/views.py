@@ -216,13 +216,10 @@ class LastBasketViewSet(viewsets.ModelViewSet):
         return models.Basket.objects.filter(customer=self.request.user, paymentStatus='pr')
 
     def create(self, request, *args, **kwargs):
-        _mutable = request.data._mutable
-        request.data._mutable = True
         if len(self.get_queryset()) > 0:
             return Response({'message': 'can not create another processing basket'}, status=status.HTTP_400_BAD_REQUEST)
         request.data['customer'] = request.user.id
         request.data['paymentStatus'] = 'pr'
-        request.data._mutable = _mutable
         return super().create(request, *args, **kwargs)
 
 
