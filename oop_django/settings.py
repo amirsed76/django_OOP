@@ -8,16 +8,18 @@ env = environ.Env(
     SECRET_KEY=str,
     DEBUG=(bool, False),
     ALLOWED_HOSTS=(list, ['127.0.0.1:8000']),
+    # ALLOWED_HOSTS=list,
     DATABASE_URL=str,
     AUTH_PASSWORD_VALIDATORS=list,
     CORS_ORIGIN_ALLOW_ALL=bool,
 )
-environ.Env.read_env()
+environ.Env.read_env(".env")
 
 SECRET_KEY = env('SECRET_KEY')
 DEBUG = env('DEBUG')
 
-ALLOWED_HOSTS=env("ALLOWED_HOSTS")
+# ALLOWED_HOSTS=env("ALLOWED_HOSTS")
+# ALLOWED_HOSTS=["*"]
 
 
 INSTALLED_APPS = [

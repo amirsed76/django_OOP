@@ -54,7 +54,7 @@ class ProductImageSerializer(serializers.ModelSerializer):
 class BasketProductSerializer(serializers.ModelSerializer):
     class Meta:
         model = models.BasketProduct
-        fields = ('basket','product','count','state')
+        fields = ("id",'basket','product','count','state')
 
 class SalesmanProfileImageSerializer(serializers.ModelSerializer):
     class Meta:
