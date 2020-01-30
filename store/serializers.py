@@ -31,11 +31,32 @@ class SalesmanSerializer(serializers.ModelSerializer):
         fields = '__all__'
 
 
+
 class BasketSerializer(serializers.ModelSerializer):
     products = serializers.PrimaryKeyRelatedField(many=True, read_only=True)
+    paymentStatus = serializers.CharField(read_only=True)
+    trackingCode = serializers.CharField(read_only=True)
+    payTime = serializers.DateTimeField(read_only=True)
+    products_status_summary=serializers.SerializerMethodField("get_summary")
     class Meta:
+
         model = models.Basket
-        fields = '__all__'
+        # fields = ["customer","paymentStatus","recordTime","trackingCode","payTime"]
+        fields="__all__"
+
+    def get_summary(self,obj):
+        basket_products = models.BasketProduct.objects.filter(basket = obj.id)
+        result = "pr"
+        deliver_flag = True
+        for product in basket_products:
+            if product.state == "se":
+                result="se"
+            if product.state != "de":
+                deliver_flag=False
+        if deliver_flag :
+            result="de"
+
+        return  result
 
 
 
@@ -52,6 +73,7 @@ class ProductImageSerializer(serializers.ModelSerializer):
 
 
 class BasketProductSerializer(serializers.ModelSerializer):
+    state=serializers.CharField(read_only=True)
     class Meta:
         model = models.BasketProduct
         fields = ("id",'basket','product','count','state')
