@@ -299,3 +299,11 @@ class productComments(generics.ListAPIView):
 class GetColors(generics.ListAPIView):
     queryset = models.Color.objects.all()
     serializer_class = serializers.ColorSerializer
+
+
+class LastBasketListProducts(generics.ListAPIView):
+    queryset = models.Basket.objects.all()
+    serializer_class = serializers.BasketInDetailSerializer
+
+    def get_queryset(self):
+        return models.Basket.objects.filter(customer=self.request.user, paymentStatus='pr')

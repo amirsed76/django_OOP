@@ -32,4 +32,5 @@ urlpatterns = [
     path('create_comment/', views.CreateComment.as_view()),
     path('product-comment/<int:product>/', views.productComments.as_view()),
     path('colors/', views.GetColors.as_view(), name="color"),
+    path('last-basket/', views.LastBasketListProducts.as_view()),
 ]
