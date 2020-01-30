@@ -46,11 +46,11 @@ class BasketSerializer(serializers.ModelSerializer):
 
     def get_summary(self,obj):
         basket_products = models.BasketProduct.objects.filter(basket = obj.id)
-        result = "pr"
+        result = "se"
         deliver_flag = True
         for product in basket_products:
-            if product.state == "se":
-                result="se"
+            if product.state == "pr":
+                result="pr"
             if product.state != "de":
                 deliver_flag=False
         if deliver_flag :
