@@ -104,3 +104,17 @@ class ColorSerializer(serializers.ModelSerializer):
     class Meta :
         model= models.Color
         fields = '__all__'
+
+
+class BasketProductInDetailSerializer(serializers.ModelSerializer):
+    product = ProductSerializer(read_only=True)
+    class Meta:
+        model = models.BasketProduct
+        fields = '__all__'
+
+
+class BasketInDetailSerializer(serializers.ModelSerializer):
+    products = BasketProductInDetailSerializer(many=True)
+    class Meta:
+        model = models.Basket
+        fields = '__all__'

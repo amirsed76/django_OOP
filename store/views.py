@@ -133,8 +133,15 @@ class ProductDetail(mixins.RetrieveModelMixin, generics.GenericAPIView):
     queryset = models.Product.objects.all()
 
     def get(self, request, *args, **kwargs):
-        return self.retrieve(request, *args, **kwargs)
-
+        product_id = kwargs['pk'] 
+        basket_products = models.BasketProduct.objects.filter(basket__customer=request.user, product=product_id) #
+        comment = False 
+        if len(basket_products) > 0: 
+            comment = True 
+        
+        resp = self.retrieve(request, *args, **kwargs) 
+        resp.data['comment'] = comment 
+        return resp 
 
 class SalesmanDetail(mixins.RetrieveModelMixin, generics.GenericAPIView):
     serializer_class = serializers.SalesmanSerializer
@@ -292,3 +299,11 @@ class productComments(generics.ListAPIView):
 class GetColors(generics.ListAPIView):
     queryset = models.Color.objects.all()
     serializer_class = serializers.ColorSerializer
+
+
+class LastBasketListProducts(generics.ListAPIView):
+    queryset = models.Basket.objects.all()
+    serializer_class = serializers.BasketInDetailSerializer
+
+    def get_queryset(self):
+        return models.Basket.objects.filter(customer=self.request.user, paymentStatus='pr')
