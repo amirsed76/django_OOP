@@ -203,6 +203,30 @@ class BasketProductViewSet(viewsets.ModelViewSet):
 
         return super().create(request, *args, **kwargs)
 
+    @transaction.atomic
+    def update(self, request, *args, **kwargs):
+        id = kwargs["pk"]
+        request.data["id"]=id
+        basket_products = models.BasketProduct.objects.filter(id=id)
+        if len(basket_products) == 0:
+            return response.Response({'message': 'basket product not found'}, status=status.HTTP_400_BAD_REQUEST)
+        basket_product = basket_products[0]
+        product_id = basket_product.product.id
+        product = models.Product.objects.filter(id=product_id)
+        if not product:
+            return response.Response({'message': 'product not found'}, status=status.HTTP_400_BAD_REQUEST)
+        product = product[0]
+        count = int(request.data['count'])
+        if product.count < count:
+            return response.Response({'message': 'product count exceeded'}, status=status.HTTP_400_BAD_REQUEST)
+        request.data["product"]=basket_product.product.id
+        request.data['basket'] = models.Basket.objects.get(customer=request.user, paymentStatus='pr').pk
+        request.data["state"] = "pr"
+        # request.data._mutable = _mutable
+        print("REQ",request.data)
+        return super().update(request, *args, **kwargs)
+
+
 
 class FinalPayment(APIView):
     permission_classes = [permissions.IsAuthenticated]
